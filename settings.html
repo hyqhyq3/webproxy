@@ -4,14 +4,22 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <script src="jquery.min.js"></script>
+    <script src="jquery-ui-1.11.2/jquery-ui.min.js"></script>
+    <script src="jtable.2.4.0/jquery.jtable.min.js"></script>
+    <link rel="stylesheet" href="jquery-ui-1.11.2/jquery-ui.css">
+    <link rel="stylesheet" href="jtable.2.4.0/themes/lightcolor/blue/jtable.min.css">
 </head>
 <body>
     排除的域名：
     <div>
-    <textarea id="excludes"></textarea>
+    <textarea id="excludes" rows="20" cols="100"></textarea>
     </div>
     <button id="btn_save">save</button>
 
+    <div id="server-list">
+    </div>
+
+    <script type="text/javascript" src="lib/common.js"></script>
     <script type="text/javascript" src="lib/settings.js" ></script>
 </body>
 </html>
