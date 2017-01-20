@@ -1,8 +1,8 @@
 {
-  "name": "My Extension",
-  "version": "2.1",
+  "name": "web proxy control",
+  "version": "0.1",
   "manifest_version": 2,
-  "description": "Gets information from Google.",
+  "description": "代理配置程序 支持HTTPS/SOCKS/HTTP代理，支持域名排除名单",
   "icons": { "128": "icon_128.png" },
   "background": {
     "persistent": false,
