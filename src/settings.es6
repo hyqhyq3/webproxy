@@ -56,7 +56,11 @@ $('#server-list').jtable({
         },
         Type: {
             title: "类型",
-            options: ["HTTPS","SOCKS5","HTTP"]
+            options: {
+                "HTTPS": "HTTPS",
+                "SOCKS5":"SOCKS5",
+                "PROXY":"HTTP"
+            }
         },
         Address: {
             title: "服务器地址",
