@@ -156,25 +156,41 @@ function getServer(id)
     return null;
 }
 
-function addServer(type, addr)
+function getUserPassByHostPort(host)
+{
+    var servers = getServers();
+    var arr = servers.filter(x=>x.Address == host);
+    if(arr.length > 0)
+    {
+        return {
+            username: arr[0].Username,
+            password: arr[0].Password
+        }
+    }
+}
+
+function addServer(data)
 {
     var servers = getServers();
     var id = servers.length + 1;
-    var server = {id: id, Type: type, Address: addr};
+    var server = {id: id};
+    for(var i in data)
+    {
+        server[i] = data[i];
+    }
     servers.push(server)
     writeServers(servers);
     return server;
 }
 
-function updateServer(id, type, addr)
+function updateServer(data)
 {
-    var servers = getServers();console.log(servers)
+    var servers = getServers();
     for(var i in servers)
     {
-        if(servers[i].id == id)
+        if(servers[i].id == data.id)
         {
-            servers[i].Type = type;
-            servers[i].Address = addr;
+            servers[i] = data;
         }
     }
     writeServers(servers);

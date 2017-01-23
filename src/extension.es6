@@ -34,6 +34,11 @@ function showServers(servers)
     }
 }
 
+$("#server_list").change(function()
+{
+    setProxy($('#server_list').val());
+})
+
 showServers(servers);
 
 function refreshButton()
