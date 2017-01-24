@@ -1,10 +1,12 @@
 
 $("#btn_connect").click(function(){
     setProxy($('#server_list').val());
+    refreshButton();
 })
 
 $("#btn_disconnect").click(function(){
     removeProxy();
+    refreshButton();
 })
 
 var servers = getServers();
@@ -37,6 +39,7 @@ function showServers(servers)
 $("#server_list").change(function()
 {
     setProxy($('#server_list').val());
+    refreshButton();
 })
 
 showServers(servers);
@@ -55,31 +58,52 @@ function refreshButton()
     }
 }
 
-$('#btn_add_exclude').click(function(){
-    var host = $('#add_exclude').val();
-    if(checkIsExclude(host))
-    {
-        removeExclude(host);
-    }
-    else
-    {
-        addExclude(host);
-    }
-    refreshExcludeButton();
-})
-
-function refreshExcludeButton()
+function refreshRadio()
 {
     var host = $('#add_exclude').val();
-    if(checkIsExclude(host))
+    if(checkInStorageArray("excludes", host))
     {
-        $('#btn_add_exclude').text("remove exclude");
+        $('input[name=radio_rule][value=direct]')[0].checked = true;
+    }
+    else if(checkInStorageArray("includes", host))
+    {
+        $('input[name=radio_rule][value=proxy]')[0].checked = true;
     }
     else
     {
-        $('#btn_add_exclude').text("add exclude");
+        $('input[name=radio_rule][value=default]')[0].checked = true;
+    }
+
+    if(checkProxy(host))
+    {
+        $('#add_exclude').css('color','blue');
+    }
+    else
+    {
+        $('#add_exclude').css('color','green');
     }
 }
+
+$("input[name=radio_rule]").change(function(){
+    var host = $('#add_exclude').val();
+    var type = this.value;
+    if(type == "proxy")
+    {
+        removeStorageArrayItem("excludes", host);
+        addStorageArrayItem("includes", host);
+    }
+    else if(type == "direct")
+    {
+        removeStorageArrayItem("includes", host);
+        addStorageArrayItem("excludes", host);
+    }
+    else
+    {
+        removeStorageArrayItem("excludes", host);
+        removeStorageArrayItem("includes", host);
+    }
+    refreshRadio();
+})
 
 document.addEventListener('DOMContentLoaded', function() {
   chrome.tabs.getSelected(null, function(tab){
@@ -87,12 +111,12 @@ document.addEventListener('DOMContentLoaded', function() {
     var url = tab.url;
     var arr = url.match(re)
     $('#add_exclude').val(arr[2]);
-    refreshExcludeButton();
+    refreshRadio();
 })
 });
 
 refreshButton();
 
 $('#add_exclude').keyup(function(){
-    refreshExcludeButton();
+    refreshRadio();
 })

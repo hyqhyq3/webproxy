@@ -6,7 +6,7 @@
     <script src="jquery.min.js"></script>
     <style>
         body {
-            min-width: 300px;
+            min-width: 350px;
         }
     </style>
 </head>
@@ -21,9 +21,12 @@
     <button id="settings">settings</button>
     <div>
         <input type="text" id="add_exclude" />
-        <button id="btn_add_exclude">add exclude</button>
+        <label><input type="radio" name="radio_rule" value="proxy"/>代理</label>
+        <label><input type="radio" name="radio_rule" value="direct"/>直接</label>
+        <label><input type="radio" name="radio_rule" value="default"/>默认</label>
     </div>
     
+    <script type="text/javascript" src="lib/gfwlist.js"></script>
     <script type="text/javascript" src="lib/common.js"></script>
     <script type="text/javascript" src="lib/extension.js"></script>
 </body>

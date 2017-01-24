@@ -10,15 +10,26 @@
     <link rel="stylesheet" href="jtable.2.4.0/themes/lightcolor/blue/jtable.min.css">
 </head>
 <body>
-    排除的域名：
     <div>
-    <textarea id="excludes" rows="20" cols="100"></textarea>
+        <p>排除的域名：</p>
+        <p><textarea id="excludes" rows="20" cols="100"></textarea></p>
+        <p><button id="btn_save">save</button></p>
     </div>
-    <button id="btn_save">save</button>
+
+    <div>
+        <p>导入GFWList
+            <input type="text" id="ctl_gfwlist_url" value="https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt" />
+            <label for="ctl_base64">内容经过base64编码</label><input type="checkbox" id="ctl_base64" checked="checked" />
+        </p>
+        <p><button id="btn_import_gfwlist">导入</button></p>
+        <p>上次导入时间:<span id="last_import_time"></span></p>
+    </div>
 
     <div id="server-list">
     </div>
 
+    <script type="text/javascript" src="lib/base64.js"></script>
+    <script type="text/javascript" src="lib/gfwlist.js"></script>
     <script type="text/javascript" src="lib/common.js"></script>
     <script type="text/javascript" src="lib/settings.js" ></script>
 </body>

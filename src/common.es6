@@ -1,6 +1,8 @@
 function setProxy(serverId)
 {
     var excludes = getExcludesString();
+    var includes = getIncludesString();
+    var gfwlist = getGFWRuleString();
     localStorage.setItem("currentProxy", serverId);
 
     var server = getServer(serverId);
@@ -12,40 +14,63 @@ function setProxy(serverId)
         mode: "pac_script",
         pacScript: {data: `
 
-            var hosts = {
+            var excludes = {
                 ${excludes}
             }
-            
-            function checkExclude(host)
-            {
-                while(host != "")
-                {
-                    if(hosts[host] != undefined)
-                    {
-                        return true;
-                    }
-                    var pos = host.indexOf(".");
-                    if(pos == -1)
-                    {
-                        return false;
-                    }
-                    host = host.substr(pos+1);
-                }
-                return false;
+
+            var includes = {
+                ${includes}
             }
+
+            var gfwhost = {
+                ${gfwlist}
+            }
+            
+            ${checkHost.toString()}
 
             function FindProxyForURL(url, host)
             {
-                if(checkExclude(host))
+                var proxy = "${server.Type} ${server.Address}";
+                if(checkHost(excludes, host))
                 {
                     return "DIRECT";
                 }
-                return "${server.Type} ${server.Address}";
+                if(checkHost(includes, host))
+                {
+                    return proxy;
+                }
+                if(checkHost(gfwhost, host))
+                {
+                    return proxy;
+                }
+                return DIRECT;
             }
             `}
     }
+    console.log("setProxy", config);
     chrome.proxy.settings.set({value: config, scope: 'regular'},function() {});
-    refreshButton();
+}
+
+function checkHost(hosts, host)
+{
+    if(hosts == undefined)
+    {
+        return false;
+    }
+    while(host != "")
+    {
+        if(hosts[host] != undefined)
+        {
+            return true;
+        }
+        var pos = host.indexOf(".");
+        if(pos == -1)
+        {
+            return false;
+        }
+        host = host.substr(pos+1);
+    }
+    return false;
 }
 
 function removeProxy()
@@ -55,7 +80,6 @@ function removeProxy()
         "mode": "direct"
     };
     chrome.proxy.settings.set({value: config, scope: 'regular'},function() {});
-    refreshButton();
 }
 
 function refreshProxy()
@@ -79,9 +103,36 @@ function getExcludesString()
     return "";
 }
 
-function getExcludeArray()
+function getIncludesString()
 {
-    var excludes = localStorage.getItem("excludes");
+    var includes = localStorage.getItem("includes");
+    if(includes != null)
+        includes = JSON.parse(includes);
+    if(Array.isArray(includes))
+    {
+        return includes.map(x=> `"${x}":1`).join(",");
+    }
+    return "";
+}
+
+function getGFWRuleString()
+{
+    return getGFWArray().map(x=> `"${x}":1`).join(",");
+}
+
+function getGFWArray()
+{
+    var data = localStorage.getItem("GFWList");
+    if(data == null)
+    {
+        return [];
+    }
+    return prepareGFWList(data);
+}
+
+function getStorageArray(name)
+{
+    var excludes = localStorage.getItem(name);
     if(excludes != null)
     {
         excludes = JSON.parse(excludes);
@@ -90,41 +141,48 @@ function getExcludeArray()
     return [];
 }
 
-function addExclude(host)
+function addStorageArrayItem(name, host)
 {
     var host = host.trim();
-    var excludes = getExcludeArray()
-    if(excludes.indexOf(host) != -1)
+    var arr = getStorageArray(name);
+    if(arr.indexOf(host) != -1)
     {
         return;
     }
-    excludes.push(host);
-    writeExcludes(excludes);
+    arr.push(host);
+    writeStorageArray(name, arr);
 }
 
-function checkIsExclude(host)
+function checkInStorageArray(name, host)
 {
     var host = host.trim();
-    var excludes = getExcludeArray()
-    return excludes.indexOf(host) != -1;
+    var includes = getStorageArray(name);
+    return includes.indexOf(host) != -1;
 }
 
-function removeExclude(host)
+function removeStorageArrayItem(name, host)
 {
     var host = host.trim();
-    var excludes = getExcludeArray()
-    if(excludes.indexOf(host) == -1)
+    var arr = getStorageArray(name);
+    if(arr.indexOf(host) == -1)
     {
         return;
     }
-    excludes.splice(excludes.indexOf(host), 1);
-    writeExcludes(excludes);
+    arr.splice(arr.indexOf(host), 1);
+    writeStorageArray(name, arr);
 }
 
-function writeExcludes(excludes)
+function writeStorageArray(name, arr)
 {
-    localStorage.setItem("excludes", JSON.stringify(excludes));
+    localStorage.setItem(name, JSON.stringify(arr));
 
+    refreshProxy();
+}
+
+function writeGFWList(data)
+{
+    localStorage.setItem("GFWList", data);
+    localStorage.setItem("GFWListUpdateTime", new Date().toString());
     refreshProxy();
 }
 
@@ -221,4 +279,26 @@ function removeServer(id)
         }
     }
     writeServers(servers);
+}
+
+function checkHostSlow(hosts, host)
+{
+    return checkHost(hosts.map(function(x){return this[x]=1,this}.bind({}))[0], host);
+}
+
+function checkProxy(host)
+{
+    var includes = getStorageArray("includes");
+    var excludes = getStorageArray("excludes");
+    var gfw = getGFWArray();
+
+    if(checkHostSlow(excludes, host))
+    {
+        return false;
+    }
+    if(checkHostSlow(includes, host) || checkHostSlow(gfw, host))
+    {
+        return true;
+    }
+    return false;
 }

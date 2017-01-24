@@ -1,3 +1,4 @@
+
 $.extend({
     parseQuery: function(str){
         return str.split("&").map(function(n){
@@ -6,14 +7,34 @@ $.extend({
     }
 })
 
-var excludes = getExcludeArray();
+var excludes = getStorageArray("excludes");
 $("#excludes").val(excludes.join("\n"))
 
 $("#btn_save").click(function(){
     var excludes = $("#excludes").val().split("\n");
     excludes = excludes.filter(x=> x != "");
-    writeExcludes(excludes);
+    writeStorageArray("excludes", excludes);
 })
+
+$("#btn_import_gfwlist").click(function(){
+    var base64 = $("#ctl_base64").is(":checked");
+    $.get($("#ctl_gfwlist_url").val(), function(data,status,xhr){
+        var data = data;
+        if(base64)
+        {
+            data = base64decode(data);
+        }
+        writeGFWList(data);
+        updateGFWListUpdateTime();
+    })
+})
+
+function updateGFWListUpdateTime()
+{
+    $("#last_import_time").text(localStorage.getItem("GFWListUpdateTime"));
+}
+
+updateGFWListUpdateTime();
 
 $('#server-list').jtable({
     title: "代理服务器列表",
