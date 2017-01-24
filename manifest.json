@@ -1,6 +1,6 @@
 {
   "name": "web proxy control",
-  "version": "0.6",
+  "version": "0.7",
   "manifest_version": 2,
   "description": "代理配置程序 支持HTTPS/SOCKS/HTTP代理，支持域名排除名单，支持GFWList",
   "icons": { "128": "icon_128.png" },

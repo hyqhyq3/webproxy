@@ -5,6 +5,10 @@ chrome.webRequest.onAuthRequired.addListener(
                 var userpass = getUserPassByHostPort(details.challenger.host + ":" + details.challenger.port);
                 callback({authCredentials: userpass});
             }
+            else
+            {
+                callback({});
+            }
         },
         {urls: ["<all_urls>"]},
         ["asyncBlocking"]);
