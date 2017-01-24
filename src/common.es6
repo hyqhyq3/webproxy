@@ -167,6 +167,14 @@ function getUserPassByHostPort(host)
             password: arr[0].Password
         }
     }
+    host = host.split(":")[0];
+    arr = servers.filter(x => x.Address == host);
+    if (arr.length > 0) {
+        return {
+            username: arr[0].Username,
+            password: arr[0].Password
+        };
+    }
 }
 
 function addServer(data)
