@@ -3,6 +3,7 @@ chrome.webRequest.onAuthRequired.addListener(
             if(details.isProxy)
             {
                 var userpass = getUserPassByHostPort(details.challenger.host + ":" + details.challenger.port);
+                console.log(details.challenger, userpass);
                 callback({authCredentials: userpass});
             }
             else
