@@ -22,7 +22,7 @@ $("#btn_import_gfwlist").click(function(){
         var data = data;
         if(base64)
         {
-            data = base64decode(data);
+            data = window.atob(data);
         }
         writeGFWList(data);
         updateGFWListUpdateTime();
